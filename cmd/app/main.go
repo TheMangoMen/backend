@@ -44,16 +44,23 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.Handle("GET /login/{uID}", handler.LogIn(auther, emailClient))
+	allowCORS := func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+			next.ServeHTTP(w, r)
+		})
+	}
+
+	router.Handle("GET /login/{uID}", allowCORS(handler.LogIn(auther, emailClient)))
 	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
 
-	router.HandleFunc("GET /jobs", handler.GetJobs(s))
+	router.Handle("GET /jobs", allowCORS(handler.GetJobs(s)))
 
-	router.HandleFunc("GET /rankings/{jid}", handler.GetRankings(s))
-	router.HandleFunc("POST /rankings", handler.AddRanking(s))
+	router.Handle("GET /rankings/{jid}", allowCORS(handler.GetRankings(s)))
+	router.Handle("POST /rankings", allowCORS(handler.AddRanking(s)))
 
-	router.HandleFunc("GET /contribution", handler.GetContribution(s))
-	router.HandleFunc("POST /contribution", handler.AddContribution(s))
+	router.Handle("GET /contribution", allowCORS(handler.GetContribution(s)))
+	router.Handle("POST /contribution", allowCORS(handler.AddContribution(s)))
 
 	server := http.Server{
 		Addr:    ":8080",
