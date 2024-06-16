@@ -55,15 +55,13 @@ ORDER BY j.company;
 			{Name: "Interview 3", Count: row.Int3Count},
 			{Name: "Offer Call", Count: row.OfferCount},
 		}
-		// Truncate the trailing stages that have 0 counts
-		index := 0
-		for i := len(stages) - 1; i >= 0; i-- {
-			if stages[i].Count > 0 {
-				index = i + 1
-				break
+
+		var filteredStages []model.Stage
+		for _, stage := range stages {
+			if stage.Count > 0 {
+				filteredStages = append(filteredStages, stage)
 			}
 		}
-		slicedStages := stages[0:index]
 
 		job := model.Job{
 			Watching: row.Watching,
@@ -72,7 +70,7 @@ ORDER BY j.company;
 			Company:  row.Company,
 			Location: row.Location,
 			Openings: row.Openings,
-			Stages:   slicedStages,
+			Stages:   filteredStages,
 		}
 		jobs = append(jobs, job)
 	}
