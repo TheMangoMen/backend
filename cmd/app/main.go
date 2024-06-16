@@ -13,9 +13,9 @@ import (
 
 func main() {
 	// Production
-	db, err := sqlx.Connect("pgx", "postgres://admin:password@172.19.134.43:5432/Milestone1?sslmode=disable")
+	// db, err := sqlx.Connect("pgx", "postgres://admin:password@172.19.134.43:5432/Milestone1?sslmode=disable")
 	// Local
-	// db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
+	db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
