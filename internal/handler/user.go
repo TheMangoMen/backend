@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-
 	"github.com/TheMangoMen/backend/internal/service"
 )
 

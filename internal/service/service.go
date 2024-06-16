@@ -11,3 +11,7 @@ type ContributionService interface {
 	GetContribution(uID string, jID string) (model.Contribution, error)
 	CreateContribution(uID string, jID string, oa bool, interviewStage int, offerCall bool) error
 }
+
+type JobService interface {
+	GetJobs(uID string) ([]model.Job, error)
+}

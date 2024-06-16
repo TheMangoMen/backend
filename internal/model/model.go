@@ -15,3 +15,35 @@ type Contribution struct {
 	InterviewStage int
 	OfferCall      bool
 }
+
+type Stage struct {
+	Name string `json:"name"`
+	Count int `json:"count"`
+}
+
+type Job struct {
+    Watching bool     `json:"watching"` 
+    JID      int      `json:"jID"`
+    Title    string   `json:"title"`
+    Company  string   `json:"company"`
+    Location string   `json:"location"`
+    Openings int      `json:"openings"`
+    Stages   []Stage `json:"stages"`
+}
+
+type JobRow struct {
+	JID        int    `db:"jid"`
+	Title      string `db:"title"`
+	Company    string `db:"company"`
+	Season		string `db:"season"`
+	Year		string `db:"year"`
+	Cycle		int 	`db:"cycle"`
+	Location   string `db:"location"`
+	Openings   int    `db:"openings"`
+	Watching   bool   `db:"watching"`
+	OACount    int    `db:"oacount"`
+	Int1Count  int    `db:"int1count"`
+	Int2Count  int    `db:"int2count"`
+	Int3Count  int    `db:"int3count"`
+	OfferCount int    `db:"offercount"`
+}
