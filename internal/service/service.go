@@ -14,6 +14,7 @@ type ContributionService interface {
 
 type JobService interface {
 	GetJobs(uID string) ([]model.Job, error)
+	CreateWatching(uID string, jIDs []string) error
 }
 
 type RankingService interface {
