@@ -2,10 +2,10 @@ package store
 
 import "github.com/TheMangoMen/backend/internal/model"
 
-func (s *Store) GetRankings(jID int) (ranking []model.Ranking, err error) {
+func (s *Store) GetRankings(jID int) ([]model.Ranking, error) {
 	var rankings []model.Ranking
 	query := "SELECT * FROM Rankings WHERE jid = $1;"
-	err = s.db.Select(&rankings, query, jID)
+	err := s.db.Select(&rankings, query, jID)
 	if err != nil {
 		return nil, err
 	}
