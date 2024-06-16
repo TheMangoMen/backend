@@ -5,10 +5,10 @@ type User struct {
 }
 
 type Ranking struct {
-	UID             string `json:"uid" db:"UID"`
-	JID             int    `json:"jid" db:"JID"`
-	UserRanking     int    `json:"userranking" db:"UserRanking"`
-	EmployerRanking string `json:"employerranking" db:"EmployerRanking"`
+	UID             string `json:"uid" db:"uid"`
+	JID             int    `json:"jid" db:"jid"`
+	UserRanking     int    `json:"userranking" db:"userranking"`
+	EmployerRanking string `json:"employerranking" db:"employerranking"`
 }
 
 type Contribution struct {

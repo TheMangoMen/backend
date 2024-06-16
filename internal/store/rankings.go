@@ -4,7 +4,7 @@ import "github.com/TheMangoMen/backend/internal/model"
 
 func (s *Store) GetRankings(jID int) (ranking []model.Ranking, err error) {
 	var rankings []model.Ranking
-	query := "SELECT * FROM Rankings WHERE JID = $1;"
+	query := "SELECT * FROM Rankings WHERE jid = $1;"
 	err = s.db.Select(&rankings, query, jID)
 	if err != nil {
 		return nil, err
@@ -15,13 +15,13 @@ func (s *Store) GetRankings(jID int) (ranking []model.Ranking, err error) {
 func (s *Store) AddRanking(ranking model.Ranking) (err error) {
 	query := `
 INSERT INTO
-    Rankings (UID, JID, UserRanking, EmployerRanking)
+    Rankings (uid, jid, userranking, employerranking)
 VALUES
-(:UID, :JID, :UserRanking, :EmployerRanking) ON CONFLICT (UID, JID) DO
+(:uid, :jid, :userranking, :employerranking) ON CONFLICT (uid, jid) DO
 UPDATE
 SET
-    UserRanking = EXCLUDED.UserRanking,
-    EmployerRanking = EXCLUDED.EmployerRanking;
+    userranking = EXCLUDED.userranking,
+    employerranking = EXCLUDED.employerranking;
 `
 	_, err = s.db.NamedExec(query, ranking)
 	return err
