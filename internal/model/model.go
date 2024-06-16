@@ -17,27 +17,27 @@ type Contribution struct {
 }
 
 type Stage struct {
-	Name string `json:"name"`
-	Count int `json:"count"`
+	Name  string `json:"name"`
+	Count int    `json:"count"`
 }
 
 type Job struct {
-    Watching bool     `json:"watching"` 
-    JID      int      `json:"jID"`
-    Title    string   `json:"title"`
-    Company  string   `json:"company"`
-    Location string   `json:"location"`
-    Openings int      `json:"openings"`
-    Stages   []Stage `json:"stages"`
+	Watching bool    `json:"watching"`
+	JID      int     `json:"jID"`
+	Title    string  `json:"title"`
+	Company  string  `json:"company"`
+	Location string  `json:"location"`
+	Openings int     `json:"openings"`
+	Stages   []Stage `json:"stages"`
 }
 
 type JobRow struct {
 	JID        int    `db:"jid"`
 	Title      string `db:"title"`
 	Company    string `db:"company"`
-	Season		string `db:"season"`
-	Year		string `db:"year"`
-	Cycle		int 	`db:"cycle"`
+	Season     string `db:"season"`
+	Year       string `db:"year"`
+	Cycle      int    `db:"cycle"`
 	Location   string `db:"location"`
 	Openings   int    `db:"openings"`
 	Watching   bool   `db:"watching"`

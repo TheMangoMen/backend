@@ -2,9 +2,9 @@ package store
 
 import "github.com/TheMangoMen/backend/internal/model"
 
-func (s *Store) GetJobs(uID string) (jobs []model.Job, err error) {
-	var rawJobs []model.JobRow
-	err = s.db.Select(&rawJobs, `
+func (s *Store) GetJobs(uID string) ([]model.Job, error) {
+	var rows []model.JobRow
+	err := s.db.Select(&rows, `
 		with
 goodjobs as (
     select j.*, coalesce(oaCount, 0) oaCount, coalesce(int1Count, 0) int1Count, coalesce(int2Count, 0) int2Count, coalesce(int3Count, 0) int3Count, coalesce(offerCount, 0) offerCount from jobs j
@@ -19,41 +19,37 @@ watches as (
 )
 select j.jid, j.title, j.company, coalesce(j.location, 'N/A') location, j.openings, j.season, j.year, j.cycle, j.oaCount, j.int1Count, j.int2Count, j.int3Count, j.offerCount, coalesce(w.watch, false) watching  from goodjobs j left join watches w on w.JID = j.JID
 order by j.jid;`, uID)
+	if err != nil {
+		return nil, err
+	}
 
-	    // Map the raw query results to the desired Job struct
-		for _, rJob := range rawJobs {
-			
-			stages := []model.Stage{
-				{Name: "OA", Count: rJob.OACount},
-				{Name: "Interview 1", Count: rJob.Int1Count},
-				{Name: "Interview 2", Count: rJob.Int2Count},
-				{Name: "Interview 3", Count: rJob.Int3Count},
-				{Name: "Offer", Count: rJob.OfferCount},
-			}
-
-			index := 0
-			for i := len(stages) - 1; i >= 0; i-- {
-				if stages[i].Count > 0 {
-					index = i + 1 // Include the first count > 0
-					break
-				}
-			}
-
-			slicedStages := stages[0:index]
-
-			job := model.Job{
-				Watching: rJob.Watching,
-				JID:      rJob.JID,
-				Title:    rJob.Title,
-				Company:  rJob.Company,
-				Location: rJob.Location,
-				Openings: rJob.Openings,
-				Stages: slicedStages,
-			}
-	
-			// Append the job to the slice
-			jobs = append(jobs, job)
+	jobs := make([]model.Job, 0, len(rows))
+	for _, row := range rows {
+		stages := []model.Stage{
+			{Name: "OA", Count: row.OACount},
+			{Name: "Interview 1", Count: row.Int1Count},
+			{Name: "Interview 2", Count: row.Int2Count},
+			{Name: "Interview 3", Count: row.Int3Count},
+			{Name: "Offer", Count: row.OfferCount},
 		}
-	return
-}
+		// Truncate the trailing stages that have 0 counts
+		for i := len(stages) - 1; i >= 0; i-- {
+			if stages[i].Count > 0 {
+				stages = stages[:i+1]
+				break
+			}
+		}
 
+		job := model.Job{
+			Watching: row.Watching,
+			JID:      row.JID,
+			Title:    row.Title,
+			Company:  row.Company,
+			Location: row.Location,
+			Openings: row.Openings,
+			Stages:   stages,
+		}
+		jobs = append(jobs, job)
+	}
+	return jobs, nil
+}

@@ -3,13 +3,13 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-	"github.com/TheMangoMen/backend/internal/service"
+
 	"github.com/TheMangoMen/backend/internal/model"
+	"github.com/TheMangoMen/backend/internal/service"
 )
 
-
 type GetJobsBody struct {
-	Jobs	[]model.Job		`json:"jobs"`
+	Jobs []model.Job `json:"jobs"`
 }
 
 func GetJobs(js service.JobService) http.HandlerFunc {
@@ -23,7 +23,7 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		
+
 		w.WriteHeader(http.StatusOK)
 	}
 }

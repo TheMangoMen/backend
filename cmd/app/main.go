@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	db, err := sqlx.Connect("pgx", "postgres://abhinav@localhost:5432/Milestone1?sslmode=disable")
+	db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
