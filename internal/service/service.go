@@ -8,6 +8,7 @@ type UserService interface {
 }
 
 type ContributionService interface {
+	GetContribution(jID int, uID string) (model.Contribution, error)
 	AddContribution(contribution model.Contribution) (err error)
 }
 

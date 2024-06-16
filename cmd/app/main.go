@@ -27,6 +27,7 @@ func main() {
 	router.HandleFunc("GET /jobs", handler.GetJobs(s))
 	router.HandleFunc("GET /rankings/{jid}", handler.GetRankings(s))
 	router.HandleFunc("POST /rankings", handler.AddRanking(s))
+	router.HandleFunc("GET /contribution", handler.GetContribution(s))
 	router.HandleFunc("POST /contribution", handler.AddContribution(s))
 	server := http.Server{
 		Addr:    ":8080",
