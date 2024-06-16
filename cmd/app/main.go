@@ -13,9 +13,9 @@ import (
 
 func main() {
 	// Production
-	// db, err := sqlx.Connect("pgx", "postgres://admin:password@172.19.134.43:5432/Milestone1?sslmode=disable")
+	db, err := sqlx.Connect("pgx", "postgres://admin:password@172.19.134.43:5432/Milestone1?sslmode=disable")
 	// Local
-	db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
+	// db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -27,6 +27,7 @@ func main() {
 	router.HandleFunc("GET /jobs", handler.GetJobs(s))
 	router.HandleFunc("GET /rankings/{jid}", handler.GetRankings(s))
 	router.HandleFunc("POST /rankings", handler.AddRanking(s))
+	router.HandleFunc("POST /contribution", handler.AddContribution(s))
 	server := http.Server{
 		Addr:    ":8080",
 		Handler: router,
