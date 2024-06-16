@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/service"
 )
 
@@ -21,10 +22,11 @@ func CreateUser(us service.UserService) http.HandlerFunc {
 
 func GetUser(us service.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := us.GetUser(r.PathValue("uID"))
+		uID := auth.FromContext(r.Context())
+		user, err := us.GetUser(uID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
-				http.Error(w, "404 user not found", http.StatusNotFound)
+				http.Error(w, "user not found", http.StatusNotFound)
 			} else {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 			}
