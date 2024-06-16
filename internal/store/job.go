@@ -39,7 +39,7 @@ LEFT JOIN interviewcounts i
     ON j.JID = i.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
-ORDER BY j.JID;
+ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
 	if err != nil {
@@ -53,15 +53,17 @@ ORDER BY j.JID;
 			{Name: "Interview 1", Count: row.Int1Count},
 			{Name: "Interview 2", Count: row.Int2Count},
 			{Name: "Interview 3", Count: row.Int3Count},
-			{Name: "Offer", Count: row.OfferCount},
+			{Name: "Offer Call", Count: row.OfferCount},
 		}
 		// Truncate the trailing stages that have 0 counts
+		index := 0
 		for i := len(stages) - 1; i >= 0; i-- {
 			if stages[i].Count > 0 {
-				stages = stages[:i+1]
+				index = i + 1
 				break
 			}
 		}
+		slicedStages := stages[0:index]
 
 		job := model.Job{
 			Watching: row.Watching,
@@ -70,7 +72,7 @@ ORDER BY j.JID;
 			Company:  row.Company,
 			Location: row.Location,
 			Openings: row.Openings,
-			Stages:   stages,
+			Stages:   slicedStages,
 		}
 		jobs = append(jobs, job)
 	}
@@ -110,7 +112,7 @@ LEFT JOIN rankingcounts r
     ON j.JID = r.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
-ORDER BY j.JID;
+ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
 	if err != nil {
