@@ -3,19 +3,23 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/TheMangoMen/backend/internal/handler"
 	"github.com/TheMangoMen/backend/internal/store"
+	"github.com/joho/godotenv"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 )
 
 func main() {
-	// Production
-	db, err := sqlx.Connect("pgx", "postgres://admin:password@172.19.134.43:5432/Milestone1?sslmode=disable")
-	// Local
-	// db, err := sqlx.Connect("pgx", "postgres://admin@localhost:5432/Milestone1?sslmode=disable")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	DB_CONNECTION := os.Getenv("DB_CONNECTION")
+	db, err := sqlx.Connect("pgx", DB_CONNECTION)
 	if err != nil {
 		log.Fatalln(err)
 	}
