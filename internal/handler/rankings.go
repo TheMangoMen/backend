@@ -13,7 +13,7 @@ import (
 
 func GetRankings(rs service.RankingService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		jIDStr := r.PathValue("jID")
+		jIDStr := r.PathValue("jid")
 		jID, err := strconv.Atoi(jIDStr)
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
