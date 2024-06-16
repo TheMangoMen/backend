@@ -14,7 +14,19 @@ type GetJobsBody struct {
 
 func GetJobs(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		jobs, err := js.GetJobs(r.PathValue("uID"))
+		uID := r.URL.Query().Get("uID")
+		isRankingStage, err := js.GetIsRankingStage()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		var jobs interface{}
+		if !isRankingStage {
+			jobs, err = js.GetJobInterviews(uID)
+		} else {
+			jobs, err = js.GetJobRankings(uID)
+		}
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -24,7 +24,7 @@ func main() {
 
 	router := http.NewServeMux()
 	router.HandleFunc("GET /user/{uID}", handler.GetUser(s))
-	router.HandleFunc("GET /jobs/{uID}", handler.GetJobs(s))
+	router.HandleFunc("GET /jobs", handler.GetJobs(s))
 	router.HandleFunc("GET /rankings/{jid}", handler.GetRankings(s))
 	router.HandleFunc("POST /rankings", handler.AddRanking(s))
 	server := http.Server{
