@@ -15,3 +15,8 @@ type ContributionService interface {
 type JobService interface {
 	GetJobs(uID string) ([]model.Job, error)
 }
+
+type RankingService interface {
+	GetRankings(jID int) ([]model.Ranking, error)
+	AddRanking(ranking model.Ranking) error
+}

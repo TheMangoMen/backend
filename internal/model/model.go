@@ -5,12 +5,15 @@ type User struct {
 }
 
 type Ranking struct {
-	// TODO
+	UID             string `json:"uid" db:"UID"`
+	JID             int    `json:"jid" db:"JID"`
+	UserRanking     int    `json:"userranking" db:"UserRanking"`
+	EmployerRanking string `json:"employerranking" db:"EmployerRanking"`
 }
 
 type Contribution struct {
 	UID            string
-	JID            string
+	JID            int
 	OA             bool
 	InterviewStage int
 	OfferCall      bool
@@ -23,7 +26,7 @@ type Stage struct {
 
 type Job struct {
 	Watching bool    `json:"watching"`
-	JID      int     `json:"jID"`
+	JID      int     `json:"jid"`
 	Title    string  `json:"title"`
 	Company  string  `json:"company"`
 	Location string  `json:"location"`
