@@ -8,6 +8,6 @@ type UserService interface {
 }
 
 type ContributionService interface {
-	CreateContribution(uID string, jID string, oa bool, interviewStage int, offerCall bool) error
 	GetContribution(uID string, jID string) (model.Contribution, error)
+	CreateContribution(uID string, jID string, oa bool, interviewStage int, offerCall bool) error
 }

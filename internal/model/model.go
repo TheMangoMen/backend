@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	UID string
+	UID string `json:"uid"`
 }
 
 type Ranking struct {

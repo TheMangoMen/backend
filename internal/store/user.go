@@ -3,7 +3,7 @@ package store
 import "github.com/TheMangoMen/backend/internal/model"
 
 func (s *Store) GetUser(uID string) (user model.User, err error) {
-	err = s.db.Select(&user, "SELECT * FROM Users WHERE UID = $1", uID)
+	err = s.db.Get(&user, "SELECT * FROM Users WHERE UID = $1", uID)
 	return
 }
 
