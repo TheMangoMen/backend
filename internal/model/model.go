@@ -12,11 +12,11 @@ type Ranking struct {
 }
 
 type Contribution struct {
-	UID            string
-	JID            int
-	OA             bool
-	InterviewStage int
-	OfferCall      bool
+	UID            string `json:"uid" db:"uid"`
+	JID            int    `json:"jid" db:"jid"`
+	OA             bool   `json:"oa" db:"oa"`
+	InterviewStage int    `json:"interviewstage" db:"interviewstage"`
+	OfferCall      bool   `json:"offercall" db:"offercall"`
 }
 
 type Stage struct {
