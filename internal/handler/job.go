@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/model"
 	"github.com/TheMangoMen/backend/internal/service"
 )
@@ -14,7 +15,12 @@ type GetJobsBody struct {
 
 func GetJobs(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := r.URL.Query().Get("uID")
+		uID, ok := auth.FromContext(r.Context())
+		if !ok {
+			// TODO: this mechanism needs to be better
+			uID = ""
+		}
+
 		isRankingStage, err := js.GetIsRankingStage()
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

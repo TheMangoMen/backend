@@ -22,7 +22,7 @@ func CreateUser(us service.UserService) http.HandlerFunc {
 
 func GetUser(us service.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.FromContext(r.Context())
+		uID := auth.MustFromContext(r.Context())
 		user, err := us.GetUser(uID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {

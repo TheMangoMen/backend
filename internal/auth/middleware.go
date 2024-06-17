@@ -13,13 +13,17 @@ type key int
 
 var authKey key
 
-func (a Auth) Middleware() func(http.Handler) http.Handler {
+func (a Auth) MiddlewareOptional(alternate http.Handler) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			cookie, err := r.Cookie("Authorization")
 			if err != nil {
 				// No cookie
-				http.Error(w, "unauthorized", http.StatusForbidden)
+				if alternate != nil {
+					alternate.ServeHTTP(w, r)
+				} else {
+					http.Error(w, "unauthorized", http.StatusForbidden)
+				}
 				return
 			}
 			const bearerPrefix = "Bearer "
@@ -46,6 +50,17 @@ func (a Auth) Middleware() func(http.Handler) http.Handler {
 	}
 }
 
-func FromContext(ctx context.Context) (uID string) {
+func (a Auth) Middleware() func(http.Handler) http.Handler {
+	return a.MiddlewareOptional(nil)
+}
+
+func MustFromContext(ctx context.Context) (uID string) {
 	return ctx.Value(authKey).(string)
+}
+
+func FromContext(ctx context.Context) (uID string, ok bool) {
+	if val := ctx.Value(authKey); val != nil {
+		return val.(string), true
+	}
+	return
 }
