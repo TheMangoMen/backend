@@ -24,6 +24,7 @@ WORKDIR /root/
 
 # Copy the binary file from the build stage
 COPY --from=builder /app/main .
+COPY .env .env
 
 # https://docs.docker.com/reference/dockerfile/#expose
 EXPOSE 8080
