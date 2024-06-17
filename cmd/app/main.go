@@ -73,5 +73,6 @@ func main() {
 		Addr:    ":8080",
 		Handler: corsRouter,
 	}
+	log.Printf("Listening on %s", server.Addr)
 	server.ListenAndServe()
 }
