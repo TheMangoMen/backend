@@ -23,8 +23,9 @@ type config struct {
 }
 
 func main() {
+	// .env parsing is optional if we can parse env variables from the system
 	if err := godotenv.Load(); err != nil {
-		log.Panicf("error reading config\n%v\n", err)
+		log.Printf("error reading config file\n%v\n", err)
 	}
 	cfg, err := env.ParseAs[config]()
 	if err != nil {
