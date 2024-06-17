@@ -12,6 +12,8 @@ import (
 func LogIn(a auth.Auth, emailer email.Emailer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uID := r.PathValue("uID")
+		// TODO: uID validation
+
 		token, err := a.NewToken(uID)
 		if err != nil {
 			http.Error(w, "error signing token", http.StatusInternalServerError)

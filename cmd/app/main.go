@@ -13,6 +13,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
+	"github.com/rs/cors"
 )
 
 type config struct {
@@ -46,7 +47,7 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.Handle("GET /login/{uID}", handler.LogIn(auther, outlookClient))
+	router.Handle("POST /login/{uID}", handler.LogIn(auther, outlookClient))
 	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
 
 	router.Handle("GET /jobs", handler.GetJobs(s))
@@ -57,14 +58,11 @@ func main() {
 	router.Handle("GET /contribution", handler.GetContribution(s))
 	router.Handle("POST /contribution", handler.AddContribution(s))
 
-	allowCORS := func(next http.Handler) http.Handler {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Set("Access-Control-Allow-Origin", "*")
-			next.ServeHTTP(w, r)
-		})
-	}
-	corsRouter := http.NewServeMux()
-	corsRouter.Handle("/", allowCORS(router))
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowCredentials: true,
+	})
+	corsRouter := c.Handler(router)
 
 	server := http.Server{
 		Addr:    ":8080",
