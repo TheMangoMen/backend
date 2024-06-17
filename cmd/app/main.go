@@ -16,9 +16,10 @@ import (
 )
 
 type config struct {
-	DBConnectionAddr string `env:"DB_CONNECTION_ADDR,required"`
-	AuthPrivateKey   string `env:"AUTH_PRIVATE_KEY,required"`
-	ResendAPIKey     string `env:"RESEND_API_KEY"`
+	DBConnectionAddr  string `env:"DB_CONNECTION_ADDR,required"`
+	AuthPrivateKey    string `env:"AUTH_PRIVATE_KEY,required"`
+	FromEmail         string `env:"FROM_EMAIL,required"`
+	FromEmailPassword string `env:"FROM_EMAIL_PASSWORD,required"`
 }
 
 func main() {
@@ -40,9 +41,20 @@ func main() {
 	auther := auth.NewAuth(cfg.AuthPrivateKey)
 	ensureAuth := auther.Middleware()
 
-	emailClient := email.NewEmailClient(cfg.ResendAPIKey, "hello@watrank.com")
+	outlookClient := email.NewOutlookClient(cfg.FromEmail, cfg.FromEmailPassword)
 
 	router := http.NewServeMux()
+
+	router.Handle("GET /login/{uID}", handler.LogIn(auther, outlookClient))
+	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
+
+	router.Handle("GET /jobs", handler.GetJobs(s))
+
+	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
+	router.Handle("POST /rankings", handler.AddRanking(s))
+
+	router.Handle("GET /contribution", handler.GetContribution(s))
+	router.Handle("POST /contribution", handler.AddContribution(s))
 
 	allowCORS := func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -50,21 +62,12 @@ func main() {
 			next.ServeHTTP(w, r)
 		})
 	}
-
-	router.Handle("GET /login/{uID}", allowCORS(handler.LogIn(auther, emailClient)))
-	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
-
-	router.Handle("GET /jobs", allowCORS(handler.GetJobs(s)))
-
-	router.Handle("GET /rankings/{jid}", allowCORS(handler.GetRankings(s)))
-	router.Handle("POST /rankings", allowCORS(handler.AddRanking(s)))
-
-	router.Handle("GET /contribution", allowCORS(handler.GetContribution(s)))
-	router.Handle("POST /contribution", allowCORS(handler.AddContribution(s)))
+	corsRouter := http.NewServeMux()
+	corsRouter.Handle("/", allowCORS(router))
 
 	server := http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: corsRouter,
 	}
 	server.ListenAndServe()
 }

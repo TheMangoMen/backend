@@ -8,7 +8,7 @@ import (
 	"github.com/TheMangoMen/backend/internal/email"
 )
 
-func LogIn(a auth.Auth, ec email.EmailClient) http.Handler {
+func LogIn(a auth.Auth, emailer email.Emailer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uID := r.PathValue("uID")
 		token, err := a.NewToken(uID)
@@ -20,7 +20,7 @@ func LogIn(a auth.Auth, ec email.EmailClient) http.Handler {
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("__Host-Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token)) // Maybe when live?
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token))
 
-		err = ec.Send(
+		err = emailer.Send(
 			fmt.Sprintf("%s@uwaterloo.ca", uID),
 			"hi there",
 			fmt.Sprintf("<p>Here is your log in link: %s</p>", token),
