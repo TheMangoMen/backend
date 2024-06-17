@@ -1,27 +1,28 @@
 package email
 
-import "github.com/resend/resend-go/v2"
+import (
+	"gopkg.in/gomail.v2"
+)
 
 type EmailClient struct {
-	from   string
-	client *resend.Client
+	from     string
+	password string
 }
 
-func NewEmailClient(apiKey string, from string) EmailClient {
+func NewEmailClient(from string, password string) EmailClient {
 	return EmailClient{
-		from:   from,
-		client: resend.NewClient(apiKey),
+		from:     from,
+		password: password,
 	}
 }
 
-func (ec *EmailClient) Send(to []string, subject string, content string) error {
-	params := &resend.SendEmailRequest{
-		From:    ec.from,
-		To:      to,
-		Subject: subject,
-		Html:    content,
-	}
+func (ec *EmailClient) Send(to string, subject string, content string) error {
+	m := gomail.NewMessage()
+	m.SetHeader("From", ec.from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", content)
 
-	_, err := ec.client.Emails.Send(params)
-	return err
+	d := gomail.NewDialer("smtp.office365.com", 587, ec.from, ec.password)
+	return d.DialAndSend(m)
 }

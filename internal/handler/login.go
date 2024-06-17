@@ -19,11 +19,9 @@ func LogIn(a auth.Auth, ec email.EmailClient) http.Handler {
 
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("__Host-Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token)) // Maybe when live?
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token))
-		// w.Write([]byte("OK"))
 
 		err = ec.Send(
-			// []string{fmt.Sprintf("%s@uwaterloo.ca", uID)},
-			[]string{"helguind@uwaterloo.ca"},
+			fmt.Sprintf("%s@uwaterloo.ca", uID),
 			"hi there",
 			fmt.Sprintf("<p>Here is your log in link: %s</p>", token),
 		)
