@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
 
@@ -20,10 +21,11 @@ func LogIn(a auth.Auth, emailer email.Emailer) http.Handler {
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("__Host-Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token)) // Maybe when live?
 		// w.Header().Add("Set-Cookie", fmt.Sprintf("Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token))
 
+		encoded := base64.URLEncoding.EncodeToString([]byte(token))
 		err = emailer.Send(
 			fmt.Sprintf("%s@uwaterloo.ca", uID),
-			"hi there",
-			fmt.Sprintf("<p>Here is your log in link: %s</p>", token),
+			"WatRank Login Link",
+			fmt.Sprintf("<p>Here is your <a href=\"https://watrank.com/callback?code=%s\">login link.</a></p>", encoded),
 		)
 		if err != nil {
 			fmt.Println(err)
