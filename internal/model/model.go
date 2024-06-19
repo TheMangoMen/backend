@@ -5,18 +5,18 @@ type User struct {
 }
 
 type Ranking struct {
-	UID             string `json:"uid" db:"UID"`
-	JID             int    `json:"jid" db:"JID"`
-	UserRanking     int    `json:"userranking" db:"UserRanking"`
-	EmployerRanking string `json:"employerranking" db:"EmployerRanking"`
+	UID             string `json:"uid" db:"uid"`
+	JID             int    `json:"jid" db:"jid"`
+	UserRanking     int    `json:"userranking" db:"userranking"`
+	EmployerRanking string `json:"employerranking" db:"employerranking"`
 }
 
 type Contribution struct {
-	UID            string
-	JID            int
-	OA             bool
-	InterviewStage int
-	OfferCall      bool
+	UID            string `json:"uid" db:"uid"`
+	JID            int    `json:"jid" db:"jid"`
+	OA             bool   `json:"oa" db:"oa"`
+	InterviewStage int    `json:"interviewstage" db:"interviewstage"`
+	OfferCall      bool   `json:"offercall" db:"offercall"`
 }
 
 type Stage struct {
@@ -34,7 +34,7 @@ type Job struct {
 	Stages   []Stage `json:"stages"`
 }
 
-type JobRow struct {
+type InterviewRow struct {
 	JID        int    `db:"jid"`
 	Title      string `db:"title"`
 	Company    string `db:"company"`
@@ -49,4 +49,19 @@ type JobRow struct {
 	Int2Count  int    `db:"int2count"`
 	Int3Count  int    `db:"int3count"`
 	OfferCount int    `db:"offercount"`
+}
+
+type RankingRow struct {
+	JID       int    `db:"jid"`
+	Title     string `db:"title"`
+	Company   string `db:"company"`
+	Season    string `db:"season"`
+	Year      string `db:"year"`
+	Cycle     int    `db:"cycle"`
+	Location  string `db:"location"`
+	Openings  int    `db:"openings"`
+	Watching  bool   `db:"watching"`
+	Ranked    int    `db:"ranked"`
+	Taking    int    `db:"taking"`
+	NotTaking int    `db:"nottaking"`
 }
