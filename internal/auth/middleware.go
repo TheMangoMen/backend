@@ -16,9 +16,9 @@ var authKey key
 func (a Auth) MiddlewareOptional(alternate http.Handler) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("Authorization")
-			if err != nil {
-				// No cookie
+			header := r.Header.Get("Authorization")
+			if header == "" {
+				// No header
 				if alternate != nil {
 					alternate.ServeHTTP(w, r)
 				} else {
@@ -27,12 +27,12 @@ func (a Auth) MiddlewareOptional(alternate http.Handler) func(http.Handler) http
 				return
 			}
 			const bearerPrefix = "Bearer "
-			if len(cookie.Value) >= len(bearerPrefix) && !strings.EqualFold(cookie.Value[:len(bearerPrefix)], bearerPrefix) {
-				// Invalid cookie
+			if len(header) >= len(bearerPrefix) && !strings.EqualFold(header[:len(bearerPrefix)], bearerPrefix) {
+				// Invalid header
 				http.Error(w, "unauthorized", http.StatusForbidden)
 				return
 			}
-			token := cookie.Value[len(bearerPrefix):]
+			token := header[len(bearerPrefix):]
 			uID, err := a.ParseToken(token)
 			if err != nil {
 				if errors.Is(err, jwt.ErrTokenExpired) {
