@@ -1,6 +1,8 @@
 package store
 
-import "github.com/TheMangoMen/backend/internal/model"
+import (
+	"github.com/TheMangoMen/backend/internal/model"
+)
 
 func (s *Store) GetJobInterviews(uID string) ([]model.Job, error) {
 	var rows []model.InterviewRow
@@ -137,4 +139,14 @@ ORDER BY j.company;
 		jobs = append(jobs, job)
 	}
 	return jobs, nil
+}
+
+func (s *Store) CreateWatching(uID string, jIDs []string) error {
+	for _, jID := range jIDs {
+		_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2)", uID, jID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

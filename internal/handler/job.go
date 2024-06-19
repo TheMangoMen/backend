@@ -44,3 +44,23 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 		}
 	}
 }
+
+type CreateWatchingBody struct {
+	UID  string   `json:"uid"`
+	JIDs []string `json:"jids"`
+}
+
+func CreateWatching(js service.JobService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body := CreateWatchingBody{}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		if err := js.CreateWatching(body.UID, body.JIDs); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
