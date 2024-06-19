@@ -13,13 +13,11 @@ type ContributionService interface {
 }
 
 type JobService interface {
-
-	GetJobs(uID string) ([]model.Job, error)
 	CreateWatching(uID string, jIDs []string) error
+	DeleteWatching(uID string, jID string) error
 	GetJobInterviews(uID string) ([]model.Job, error)
 	GetJobRankings(uID string) ([]model.Job, error)
 	GetIsRankingStage() (isRankingStage bool, err error)
-
 }
 
 type RankingService interface {

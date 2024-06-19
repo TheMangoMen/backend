@@ -141,6 +141,16 @@ ORDER BY j.company;
 	return jobs, nil
 }
 
+func (s *Store) DeleteWatching(uID string, jID string) error {
+
+	_, err := s.db.Exec("DELETE FROM Watching VALUES ($1, $2)", uID, jID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Store) CreateWatching(uID string, jIDs []string) error {
 	for _, jID := range jIDs {
 		_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2)", uID, jID)

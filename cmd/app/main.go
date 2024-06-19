@@ -59,6 +59,8 @@ func main() {
 	router.Handle("GET /contribution/{jID}", ensureAuth(handler.GetContribution(s)))
 	router.Handle("POST /contribution", ensureAuth(handler.AddContribution(s)))
 
+	router.Handle("POST /watching", ensureAuth(handler.UpdateWatching(s)))
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
