@@ -46,13 +46,13 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 }
 
 type CreateWatchingBody struct {
-	UID  string   `json:"uid"`
-	JIDs []string `json:"jids"`
+	UID  string `json:"uid"`
+	JIDs []int  `json:"jids"`
 }
 
 type DeleteWatchingBody struct {
-	JID    string `json:"jid"`
-	Delete bool   `json:"delete"`
+	JID    int  `json:"jid"`
+	Delete bool `json:"delete"`
 }
 
 func UpdateWatching(js service.JobService) http.HandlerFunc {
@@ -77,7 +77,7 @@ func UpdateWatching(js service.JobService) http.HandlerFunc {
 			}
 			w.WriteHeader(http.StatusOK)
 		} else {
-			jids := []string{body.JID}
+			jids := []int{body.JID}
 			if err := js.CreateWatching(uID, jids); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
