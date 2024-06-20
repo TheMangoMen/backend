@@ -8,6 +8,6 @@ func (s *Store) GetUser(uID string) (user model.User, err error) {
 }
 
 func (s *Store) CreateUser(uID string) error {
-	_, err := s.db.Exec("INSERT INTO Users (UID) VALUES ($1)", uID)
+	_, err := s.db.Exec("INSERT INTO Users (UID) VALUES ($1) ON CONFLICT DO NOTHING", uID)
 	return err
 }

@@ -47,7 +47,7 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.Handle("POST /login/{uID}", handler.LogIn(auther, outlookClient))
+	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, outlookClient))
 
 	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
 	router.Handle("POST /rankings", handler.AddRanking(s))
@@ -59,10 +59,12 @@ func main() {
 	router.Handle("GET /contribution/{jID}", ensureAuth(handler.GetContribution(s)))
 	router.Handle("POST /contribution", ensureAuth(handler.AddContribution(s)))
 
+	router.Handle("POST /watching", ensureAuth(handler.UpdateWatching(s)))
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,
-		AllowedHeaders:   []string{"Authorization"},
+		AllowedHeaders:   []string{"*"},
 	})
 	corsRouter := c.Handler(router)
 

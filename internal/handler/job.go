@@ -46,8 +46,45 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 }
 
 type CreateWatchingBody struct {
-	UID  string   `json:"uid"`
-	JIDs []string `json:"jids"`
+	UID  string `json:"uid"`
+	JIDs []int  `json:"jids"`
+}
+
+type DeleteWatchingBody struct {
+	JID    int  `json:"jid"`
+	Delete bool `json:"delete"`
+}
+
+func UpdateWatching(js service.JobService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		body := DeleteWatchingBody{}
+
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		uID, ok := auth.FromContext(r.Context())
+		if !ok {
+			http.Error(w, "Error deleting watching", http.StatusBadRequest)
+			return
+		}
+
+		if body.Delete {
+			if err := js.DeleteWatching(uID, body.JID); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		} else {
+			jids := []int{body.JID}
+			if err := js.CreateWatching(uID, jids); err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+		}
+	}
 }
 
 func CreateWatching(js service.JobService) http.HandlerFunc {
