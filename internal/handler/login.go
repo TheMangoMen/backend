@@ -7,21 +7,25 @@ import (
 
 	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/email"
+	"github.com/TheMangoMen/backend/internal/service"
 )
 
-func LogIn(a auth.Auth, emailer email.Emailer) http.Handler {
+func LogIn(a auth.Auth, us service.UserService, emailer email.Emailer) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		uID := r.PathValue("uID")
-		// TODO: uID validation
+
+		// TODO: Export to Waterloo package
+		// TODO: more validation
+		if len(uID) != 8 {
+			http.Error(w, "invalid uID", http.StatusBadRequest)
+			return
+		}
 
 		token, err := a.NewToken(uID)
 		if err != nil {
 			http.Error(w, "error signing token", http.StatusInternalServerError)
 			return
 		}
-
-		// w.Header().Add("Set-Cookie", fmt.Sprintf("__Host-Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token)) // Maybe when live?
-		// w.Header().Add("Set-Cookie", fmt.Sprintf("Authorization=Bearer %s; path=/; Secure; SameSite=strict; HttpOnly", token))
 
 		encoded := base64.URLEncoding.EncodeToString([]byte(token))
 		err = emailer.Send(
@@ -30,10 +34,15 @@ func LogIn(a auth.Auth, emailer email.Emailer) http.Handler {
 			fmt.Sprintf("<p>Here is your <a href=\"http://localhost:3000/callback?code=%s\">login link.</a></p>", encoded),
 		)
 		if err != nil {
-			fmt.Println(err)
 			http.Error(w, "error sending email", http.StatusInternalServerError)
 			return
 		}
+
+		if err := us.CreateUser(uID); err != nil {
+			http.Error(w, "error creating user", http.StatusInternalServerError)
+			return
+		}
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})
