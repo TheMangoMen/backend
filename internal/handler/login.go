@@ -16,7 +16,7 @@ func LogIn(a auth.Auth, us service.UserService, emailer email.Emailer) http.Hand
 
 		// TODO: Export to Waterloo package
 		// TODO: more validation
-		if len(uID) != 8 {
+		if len(uID) > 8 || len(uID) == 0 {
 			http.Error(w, "invalid uID", http.StatusBadRequest)
 			return
 		}
