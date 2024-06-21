@@ -31,7 +31,7 @@ func LogIn(a auth.Auth, us service.UserService, emailer email.Emailer) http.Hand
 		err = emailer.Send(
 			fmt.Sprintf("%s@uwaterloo.ca", uID),
 			"WatRank Login Link",
-			fmt.Sprintf("<p>Here is your <a href=\"http://localhost:3000/callback?code=%s\">login link.</a></p>", encoded),
+			fmt.Sprintf("<p>Here is your <a href=\"https://watrank.com/callback?code=%s\">login link.</a></p>", encoded),
 		)
 		if err != nil {
 			http.Error(w, "error sending email", http.StatusInternalServerError)
