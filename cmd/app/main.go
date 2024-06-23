@@ -17,10 +17,11 @@ import (
 )
 
 type config struct {
-	DBConnectionAddr  string `env:"DB_CONNECTION_ADDR,required"`
-	AuthPrivateKey    string `env:"AUTH_PRIVATE_KEY,required"`
-	FromEmail         string `env:"FROM_EMAIL,required"`
-	FromEmailPassword string `env:"FROM_EMAIL_PASSWORD,required"`
+	DBConnectionAddr string `env:"DB_CONNECTION_ADDR,required"`
+	AuthPrivateKey   string `env:"AUTH_PRIVATE_KEY,required"`
+
+	FromEmail    string `env:"FROM_EMAIL,required"`
+	ResendAPIKey string `env:"RESEND_API_KEY,required"`
 }
 
 func main() {
@@ -43,11 +44,11 @@ func main() {
 	auther := auth.NewAuth(cfg.AuthPrivateKey)
 	ensureAuth := auther.Middleware()
 
-	outlookClient := email.NewOutlookClient(cfg.FromEmail, cfg.FromEmailPassword)
+	resendClient := email.NewResendClient(cfg.FromEmail, cfg.ResendAPIKey)
 
 	router := http.NewServeMux()
 
-	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, outlookClient))
+	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
 	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
 	router.Handle("POST /rankings", handler.AddRanking(s))
