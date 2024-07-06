@@ -40,10 +40,7 @@ func main() {
 	}
 
 	s := store.NewStore(db)
-
 	auther := auth.NewAuth(cfg.AuthPrivateKey)
-	ensureAuth := auther.Middleware()
-
 	resendClient := email.NewResendClient(cfg.FromEmail, cfg.ResendAPIKey)
 
 	router := http.NewServeMux()
@@ -51,16 +48,16 @@ func main() {
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
 	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
-	router.Handle("POST /rankings", handler.AddRanking(s))
+	router.Handle("POST /rankings", auther.Middleware(handler.AddRanking(s)))
 
-	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s))(handler.GetJobs(s)))
+	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s)))
 
-	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
+	router.Handle("GET /user", auther.Middleware(handler.GetUser(s)))
 
-	router.Handle("GET /contribution/{jID}", ensureAuth(handler.GetContribution(s)))
-	router.Handle("POST /contribution", ensureAuth(handler.AddContribution(s)))
+	router.Handle("GET /contribution/{jID}", auther.Middleware(handler.GetContribution(s)))
+	router.Handle("POST /contribution", auther.Middleware(handler.AddContribution(s)))
 
-	router.Handle("POST /watching", ensureAuth(handler.UpdateWatching(s)))
+	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

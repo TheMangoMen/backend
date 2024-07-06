@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/model"
 	"github.com/TheMangoMen/backend/internal/service"
 )
@@ -34,14 +35,27 @@ func GetRankings(rs service.RankingService) http.HandlerFunc {
 	}
 }
 
+type AddRankingBody struct {
+	JID             int    `json:"jid"`
+	UserRanking     int    `json:"userranking"`
+	EmployerRanking string `json:"employerranking"`
+}
+
 func AddRanking(rs service.RankingService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body := model.Ranking{}
+		uID := auth.MustFromContext(r.Context())
+		body := AddRankingBody{}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := rs.AddRanking(body); err != nil {
+		ranking := model.Ranking{
+			UID:             uID,
+			JID:             body.JID,
+			UserRanking:     body.UserRanking,
+			EmployerRanking: body.EmployerRanking,
+		}
+		if err := rs.AddRanking(ranking); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
