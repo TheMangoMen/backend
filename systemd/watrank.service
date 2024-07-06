@@ -1,0 +1,10 @@
+[Unit]
+Description=WatRank Backend
+After=network.target
+
+[Service]
+ExecStart=/home/debian/backend/main
+WorkingDirectory=/home/debian/backend
+
+[Install]
+WantedBy=multi-user.target
