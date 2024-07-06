@@ -19,6 +19,5 @@ jobs:
       - name: Deploy
         run: |
           ssh -o "StrictHostKeyChecking no" debian@watrank "
-            /bin/bash /home/debian/backend/systemd/build.sh
-            sudo systemctl restart watrank.service
+            /home/debian/backend/systemd/build.sh && sudo systemctl restart watrank.service
           "
