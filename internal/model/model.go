@@ -65,3 +65,8 @@ type RankingRow struct {
 	Taking    int    `db:"taking"`
 	NotTaking int    `db:"nottaking"`
 }
+
+type WatchedStatusCount struct {
+	Status string `db:"status"`
+	Count  int    `db:"count"`
+}

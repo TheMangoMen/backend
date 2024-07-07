@@ -24,3 +24,7 @@ type RankingService interface {
 	GetRankings(jID int) ([]model.Ranking, error)
 	AddRanking(ranking model.Ranking) error
 }
+
+type AnalyticsService interface {
+	GetWatchedStatusCount(uID string) ([]model.WatchedStatusCount, error)
+}
