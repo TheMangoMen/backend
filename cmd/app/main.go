@@ -59,7 +59,7 @@ func main() {
 
 	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
 
-	router.Handle("GET /analytics/status_count", ensureAuth(handler.GetWatchedStatusCount(s)))
+	router.Handle("GET /analytics/status_count", auther.Middleware(handler.GetWatchedStatusCount(s)))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
