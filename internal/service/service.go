@@ -26,5 +26,6 @@ type RankingService interface {
 }
 
 type AnalyticsService interface {
-	GetWatchedStatusCount(uID string) ([]model.WatchedStatusCount, error)
+	GetWatchedJobsStatusCounts(uID string) ([]model.StatusCount, error)
+	GetWatchedCompaniesStatusCounts(uID string) ([]model.StatusCount, error)
 }
