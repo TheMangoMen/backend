@@ -15,8 +15,18 @@ type Contribution struct {
 	UID            string `json:"uid" db:"uid"`
 	JID            int    `json:"jid" db:"jid"`
 	OA             bool   `json:"oa" db:"oa"`
-	InterviewStage int    `json:"interviewstage" db:"interviewstage"`
+	InterviewStage int    `json:"interviewcount" db:"interviewstage"`
 	OfferCall      bool   `json:"offercall" db:"offercall"`
+}
+
+type ContributionTags struct {
+	UID           string `json:"uid" db:"uid"`
+	JID           int    `json:"jid" db:"jid"`
+	OADifficulty  string `json:"oadifficulty" db:"oa1"`
+	OALength      string `json:"oalength" db:"oa2"`
+	InterviewVibe string `json:"interviewvibe" db:"int1"`
+	InterviewTech string `json:"interviewtechnical" db:"int2"`
+	OfferComp     int    `json:"compensation" db:"offer1"`
 }
 
 type Stage struct {
