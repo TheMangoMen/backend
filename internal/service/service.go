@@ -14,7 +14,7 @@ type ContributionService interface {
 }
 
 type JobService interface {
-	CreateWatching(uID string, jIDs []int) error
+	CreateWatching(uID string, jID int) error
 	DeleteWatching(uID string, jID int) error
 	GetJobInterviews(uID string) ([]model.Job, error)
 	GetJobRankings(uID string) ([]model.Job, error)
