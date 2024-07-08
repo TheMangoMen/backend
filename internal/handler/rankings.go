@@ -43,14 +43,14 @@ type AddRankingBody struct {
 
 func AddRanking(rs service.RankingService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
+		user := auth.MustFromContext(r.Context())
 		body := AddRankingBody{}
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		ranking := model.Ranking{
-			UID:             uID,
+			UID:             user.UID,
 			JID:             body.JID,
 			UserRanking:     body.UserRanking,
 			EmployerRanking: body.EmployerRanking,

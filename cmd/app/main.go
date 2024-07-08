@@ -45,6 +45,18 @@ func main() {
 
 	router := http.NewServeMux()
 
+	// HI NORMAN! THIS IS FOR YOU! UNCOMMENT IT AND WRAP A ROUTE LIKE USUAL, NO NEED TO USE auther.Middleware THIS WILL HANDLE THAT ALREADY :)
+	// adminMiddleware := func(next http.Handler) http.Handler {
+	// 	return auther.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	// 		user := auth.MustFromContext(r.Context())
+	// 		if !user.Admin {
+	// 			http.Error(w, "access forbidden", http.StatusForbidden)
+	// 			return
+	// 		}
+	// 		next.ServeHTTP(w, r)
+	// 	}))
+	// }
+
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
 	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))

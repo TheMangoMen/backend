@@ -4,6 +4,7 @@ import "github.com/TheMangoMen/backend/internal/model"
 
 type UserService interface {
 	GetUser(uID string) (model.User, error)
+	GetIsAdmin(uID string) (bool, error)
 	CreateUser(uID string) error
 }
 

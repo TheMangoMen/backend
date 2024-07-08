@@ -23,30 +23,45 @@ func NewAuth(key string) Auth {
 
 type Claims struct {
 	jwt.RegisteredClaims
+	Admin *bool `json:"admin,omitempty"`
 }
 
-func (a Auth) NewToken(uID string) (string, error) {
-	token := jwt.NewWithClaims(a.signingMethod, Claims{
-		jwt.RegisteredClaims{
-			Subject:   uID,
+type User struct {
+	UID   string
+	Admin bool
+}
+
+func (a Auth) NewToken(user User) (string, error) {
+	claims := Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			Subject:   user.UID,
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(2 * 24 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
-	})
+	}
+	if user.Admin {
+		claims.Admin = &user.Admin
+	}
+
+	token := jwt.NewWithClaims(a.signingMethod, claims)
 	return token.SignedString(a.key)
 }
 
 // ParseToken parses and verifies a token.
-func (a Auth) ParseToken(tokenString string) (uID string, err error) {
-	var token *jwt.Token
-	token, err = jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+func (a Auth) ParseToken(tokenString string) (User, error) {
+	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
 		return a.key, nil
 	})
 	if err != nil {
-		return "", err
+		return User{}, err
 	}
 	if !token.Valid {
-		return "", ErrInvalidToken
+		return User{}, ErrInvalidToken
 	}
-	return token.Claims.GetSubject()
+
+	claims := token.Claims.(Claims)
+	return User{
+		UID:   claims.Subject,
+		Admin: claims.Admin != nil && *claims.Admin,
+	}, nil
 }
