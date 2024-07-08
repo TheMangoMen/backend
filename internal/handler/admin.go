@@ -15,7 +15,13 @@ func UpdateStage(as service.AdminService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := as.UpdateStage(payload.IsRankingStage); err != nil {
+		updatedRankingStage, err := as.UpdateStage(payload.IsRankingStage)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(map[string]interface{}{"isRankingStage": updatedRankingStage}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -32,7 +38,13 @@ func UpdateYear(as service.AdminService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := as.UpdateYear(payload.Year); err != nil {
+		updatedYear, err := as.UpdateYear(payload.Year)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(map[string]interface{}{"year": updatedYear}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -49,7 +61,13 @@ func UpdateSeason(as service.AdminService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := as.UpdateSeason(payload.Season); err != nil {
+		updatedSeason, err := as.UpdateSeason(payload.Season)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(map[string]interface{}{"season": updatedSeason}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -66,7 +84,13 @@ func UpdateCycle(as service.AdminService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if err := as.UpdateCycle(payload.Cycle); err != nil {
+		updatedCycle, err := as.UpdateCycle(payload.Cycle)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		if err := json.NewEncoder(w).Encode(map[string]interface{}{"cycle": updatedCycle}); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}

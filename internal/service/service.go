@@ -32,10 +32,10 @@ type AnalyticsService interface {
 }
 
 type AdminService interface {
-	UpdateStage(isRankingStage bool) error
-	UpdateYear(year int) error
-	UpdateSeason(season string) error
-	UpdateCycle(cycle int) error
+	UpdateStage(isRankingStage bool) (bool, error)
+	UpdateYear(year int) (int, error)
+	UpdateSeason(season string) (string, error)
+	UpdateCycle(cycle int) (int, error)
 	GetStage() (bool, error)
 	GetYear() (int, error)
 	GetSeason() (string, error)
