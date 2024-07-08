@@ -36,5 +36,9 @@ type AdminService interface {
 	UpdateYear(year int) error
 	UpdateSeason(season string) error
 	UpdateCycle(cycle int) error
+	GetStage() (bool, error)
+	GetYear() (int, error)
+	GetSeason() (string, error)
+	GetCycle() (int, error)
 	GetContributionLogs() ([]model.ContributionLog, error)
 }

@@ -38,6 +38,61 @@ SET cycle = $1;
 	return err
 }
 
+func (s *Store) GetStage() (bool, error) {
+	var isRankingStage bool
+	query := `
+SELECT *
+FROM Stage;
+`
+	err := s.db.Get(&isRankingStage, query)
+	if err != nil {
+		return false, err
+	}
+	return isRankingStage, nil
+}
+
+func (s *Store) GetYear() (int, error) {
+	var year int
+	query := `
+SELECT *
+FROM Year;
+`
+	err := s.db.Get(&year, query)
+	if err != nil {
+		return 0, err
+	}
+	return year, nil
+
+}
+
+func (s *Store) GetSeason() (string, error) {
+	var season string
+	query := `
+SELECT *
+FROM Season;
+`
+	err := s.db.Get(&season, query)
+	if err != nil {
+		return "", err
+	}
+	return season, nil
+
+}
+
+func (s *Store) GetCycle() (int, error) {
+	var cycle int
+	query := `
+SELECT *
+FROM Cycle;
+`
+	err := s.db.Get(&cycle, query)
+	if err != nil {
+		return 0, err
+	}
+	return cycle, nil
+
+}
+
 // TODO: add pagination
 func (s *Store) GetContributionLogs() ([]model.ContributionLog, error) {
 	var contributionLogs []model.ContributionLog

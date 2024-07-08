@@ -11,13 +11,13 @@ import (
 
 func GetWatchedStatusCounts(as service.AnalyticsService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
-		watchedJobsStatusCounts, err := as.GetWatchedJobsStatusCounts(uID)
+		user := auth.MustFromContext(r.Context())
+		watchedJobsStatusCounts, err := as.GetWatchedJobsStatusCounts(user.UID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		watchedCompaniesStatusCounts, err := as.GetWatchedCompaniesStatusCounts(uID)
+		watchedCompaniesStatusCounts, err := as.GetWatchedCompaniesStatusCounts(user.UID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
