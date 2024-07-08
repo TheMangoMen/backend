@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -34,17 +35,18 @@ func (a Auth) MiddlewareFork(authed http.Handler, notAuthed http.Handler) http.H
 			return
 		}
 		token := header[len(bearerPrefix):]
-		uID, err := a.ParseToken(token)
+		user, err := a.ParseToken(token)
 		if err != nil {
 			if errors.Is(err, jwt.ErrTokenExpired) {
 				http.Error(w, "token expired", http.StatusUnauthorized)
 			} else {
 				http.Error(w, "unauthorized", http.StatusForbidden)
+				log.Printf("%w\n", err)
 			}
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), authKey, uID)
+		ctx := context.WithValue(r.Context(), authKey, user)
 		r = r.WithContext(ctx)
 		authed.ServeHTTP(w, r)
 	})
@@ -61,13 +63,13 @@ func (a Auth) Middleware(next http.Handler) http.Handler {
 	return a.MiddlewareFork(next, nil)
 }
 
-func MustFromContext(ctx context.Context) (uID string) {
-	return ctx.Value(authKey).(string)
+func MustFromContext(ctx context.Context) (user User) {
+	return ctx.Value(authKey).(User)
 }
 
-func FromContext(ctx context.Context) (uID string, ok bool) {
+func FromContext(ctx context.Context) (user User, ok bool) {
 	if val := ctx.Value(authKey); val != nil {
-		return val.(string), true
+		return val.(User), true
 	}
 	return
 }

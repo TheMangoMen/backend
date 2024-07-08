@@ -21,7 +21,18 @@ func LogIn(a auth.Auth, us service.UserService, emailer email.Emailer) http.Hand
 			return
 		}
 
-		token, err := a.NewToken(uID)
+		if err := us.CreateUser(uID); err != nil {
+			http.Error(w, "error creating user", http.StatusInternalServerError)
+			return
+		}
+
+		admin, err := us.GetIsAdmin(uID)
+		if err != nil {
+			http.Error(w, "error checking user admin status", http.StatusInternalServerError)
+			return
+		}
+
+		token, err := a.NewToken(auth.User{UID: uID, Admin: admin})
 		if err != nil {
 			http.Error(w, "error signing token", http.StatusInternalServerError)
 			return
@@ -35,11 +46,6 @@ func LogIn(a auth.Auth, us service.UserService, emailer email.Emailer) http.Hand
 		)
 		if err != nil {
 			http.Error(w, "error sending email", http.StatusInternalServerError)
-			return
-		}
-
-		if err := us.CreateUser(uID); err != nil {
-			http.Error(w, "error creating user", http.StatusInternalServerError)
 			return
 		}
 

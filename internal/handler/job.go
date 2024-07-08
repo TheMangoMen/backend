@@ -15,7 +15,8 @@ type GetJobsBody struct {
 
 func GetJobs(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID, ok := auth.FromContext(r.Context())
+		user, ok := auth.FromContext(r.Context())
+		uID := user.UID
 		if !ok {
 			// TODO: this mechanism needs to be better
 			uID = ""
@@ -65,21 +66,21 @@ func UpdateWatching(js service.JobService) http.HandlerFunc {
 			return
 		}
 
-		uID, ok := auth.FromContext(r.Context())
+		user, ok := auth.FromContext(r.Context())
 		if !ok {
 			http.Error(w, "Error deleting watching", http.StatusBadRequest)
 			return
 		}
 
 		if body.Delete {
-			if err := js.DeleteWatching(uID, body.JID); err != nil {
+			if err := js.DeleteWatching(user.UID, body.JID); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}
 			w.WriteHeader(http.StatusOK)
 		} else {
 			jids := []int{body.JID}
-			if err := js.CreateWatching(uID, jids); err != nil {
+			if err := js.CreateWatching(user.UID, jids); err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
 				return
 			}

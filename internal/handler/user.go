@@ -22,8 +22,8 @@ func CreateUser(us service.UserService) http.HandlerFunc {
 
 func GetUser(us service.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
-		user, err := us.GetUser(uID)
+		u := auth.MustFromContext(r.Context())
+		user, err := us.GetUser(u.UID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				http.Error(w, "user not found", http.StatusNotFound)
