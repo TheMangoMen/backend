@@ -61,6 +61,13 @@ func main() {
 
 	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
 
+	// TODO: add admin level checks
+	router.Handle("POST /admin/stage", handler.UpdateStage(s))
+	router.Handle("POST /admin/year", handler.UpdateYear(s))
+	router.Handle("POST /admin/season", handler.UpdateSeason(s))
+	router.Handle("POST /admin/cycle", handler.UpdateCycle(s))
+	router.Handle("GET /admin/contributions", handler.GetContributionLogs(s))
+
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},
 		AllowCredentials: true,

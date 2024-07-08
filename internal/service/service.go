@@ -29,3 +29,11 @@ type AnalyticsService interface {
 	GetWatchedJobsStatusCounts(uID string) ([]model.StatusCount, error)
 	GetWatchedCompaniesStatusCounts(uID string) ([]model.StatusCount, error)
 }
+
+type AdminService interface {
+	UpdateStage(isRankingStage bool) error
+	UpdateYear(year int) error
+	UpdateSeason(season string) error
+	UpdateCycle(cycle int) error
+	GetContributionLogs() ([]model.ContributionLog, error)
+}
