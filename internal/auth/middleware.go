@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 
@@ -40,6 +41,7 @@ func (a Auth) MiddlewareFork(authed http.Handler, notAuthed http.Handler) http.H
 				http.Error(w, "token expired", http.StatusUnauthorized)
 			} else {
 				http.Error(w, "unauthorized", http.StatusForbidden)
+				log.Printf("%w\n", err)
 			}
 			return
 		}

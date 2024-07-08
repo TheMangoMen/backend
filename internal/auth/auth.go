@@ -49,7 +49,8 @@ func (a Auth) NewToken(user User) (string, error) {
 
 // ParseToken parses and verifies a token.
 func (a Auth) ParseToken(tokenString string) (User, error) {
-	token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
+	claims := Claims{}
+	token, err := jwt.ParseWithClaims(tokenString, &claims, func(t *jwt.Token) (interface{}, error) {
 		return a.key, nil
 	})
 	if err != nil {
@@ -59,9 +60,9 @@ func (a Auth) ParseToken(tokenString string) (User, error) {
 		return User{}, ErrInvalidToken
 	}
 
-	claims := token.Claims.(Claims)
-	return User{
+	user := User{
 		UID:   claims.Subject,
 		Admin: claims.Admin != nil && *claims.Admin,
-	}, nil
+	}
+	return user, nil
 }
