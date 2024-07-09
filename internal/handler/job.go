@@ -7,6 +7,7 @@ import (
 	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/model"
 	"github.com/TheMangoMen/backend/internal/service"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type GetJobsBody struct {
@@ -47,19 +48,14 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 	}
 }
 
-type CreateWatchingBody struct {
-	UID  string `json:"uid"`
-	JIDs []int  `json:"jids"`
-}
-
-type DeleteWatchingBody struct {
-	JID    int  `json:"jid"`
-	Delete bool `json:"delete"`
+type UpdateWatchingBody struct {
+	JIDs   []int `json:"jids"`
+	Delete bool  `json:"delete"`
 }
 
 func UpdateWatching(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body := DeleteWatchingBody{}
+		body := UpdateWatchingBody{}
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -72,33 +68,19 @@ func UpdateWatching(js service.JobService) http.HandlerFunc {
 			return
 		}
 
+		updateFunc := js.CreateWatching
 		if body.Delete {
-			if err := js.DeleteWatching(user.UID, body.JID); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-		} else {
-			jids := []int{body.JID}
-			if err := js.CreateWatching(user.UID, jids); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
+			updateFunc = js.DeleteWatching
 		}
-	}
-}
 
-func CreateWatching(js service.JobService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		body := CreateWatchingBody{}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if err := js.CreateWatching(body.UID, body.JIDs); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		const foreignKeyViolationErrorCode = "23503"
+		for _, jID := range body.JIDs {
+			if err := updateFunc(user.UID, jID); err != nil {
+				if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code != foreignKeyViolationErrorCode {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 		}
 		w.WriteHeader(http.StatusOK)
 	}
