@@ -9,8 +9,8 @@ type UserService interface {
 }
 
 type ContributionService interface {
-	GetContribution(jID int, uID string) (model.Contribution, error)
-	AddContribution(contribution model.Contribution) (err error)
+	GetContribution(jID int, uID string) (model.Contribution, model.ContributionTags, error)
+	AddContribution(contribution model.Contribution, tags model.ContributionTags) (err error)
 }
 
 type JobService interface {

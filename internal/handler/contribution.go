@@ -17,7 +17,7 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
 		}
-		contribution, err := cs.GetContribution(jID, user.UID)
+		contribution, contributionTags, err := cs.GetContribution(jID, uID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -27,33 +27,58 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		if err := json.NewEncoder(w).Encode(&contributionTags); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 	}
 }
 
 type AddContributionBody struct {
-	JID            int  `json:"jid" db:"jid"`
-	OA             bool `json:"oa" db:"oa"`
-	InterviewStage int  `json:"interviewstage" db:"interviewstage"`
-	OfferCall      bool `json:"offercall" db:"offercall"`
+	JID            int    `json:"jid" db:"jid"`
+	OA             bool   `json:"oa" db:"oa"`
+	Interview      bool   `json:"interview"`
+	InterviewStage int    `json:"interviewcount" db:"interviewstage"`
+	OfferCall      bool   `json:"offercall" db:"offercall"`
+	OADifficulty   string `json:"oadifficulty" db:"oa1"`
+	OALength       string `json:"oalength" db:"oa2"`
+	InterviewVibe  string `json:"interviewvibe" db:"int1"`
+	InterviewTech  string `json:"interviewtechnical" db:"int2"`
+	OfferComp      int    `json:"compensation" db:"offer1"`
 }
 
 func AddContribution(cs service.ContributionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := auth.MustFromContext(r.Context())
 		body := AddContributionBody{}
+		interviewCnt := 0
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		}
+		if body.Interview == true {
+			interviewCnt = body.InterviewStage
 		}
 		contribution := model.Contribution{
 			UID:            user.UID,
 			JID:            body.JID,
 			OA:             body.OA,
-			InterviewStage: body.InterviewStage,
+			InterviewStage: interviewCnt,
 			OfferCall:      body.OfferCall,
 		}
-		if err := cs.AddContribution(contribution); err != nil {
+
+		contributionTags := model.ContributionTags{
+			UID:           uID,
+			JID:           body.JID,
+			OADifficulty:  body.OADifficulty,
+			OALength:      body.OALength,
+			InterviewVibe: body.InterviewVibe,
+			InterviewTech: body.InterviewTech,
+			OfferComp:     body.OfferComp,
+		}
+		//mapping to create a contributionTags
+		if err := cs.AddContribution(contribution, contributionTags); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
