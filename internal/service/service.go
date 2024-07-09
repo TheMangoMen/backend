@@ -25,3 +25,20 @@ type RankingService interface {
 	GetRankings(jID int) ([]model.Ranking, error)
 	AddRanking(ranking model.Ranking) error
 }
+
+type AnalyticsService interface {
+	GetWatchedJobsStatusCounts(uID string) ([]model.StatusCount, error)
+	GetWatchedCompaniesStatusCounts(uID string) ([]model.StatusCount, error)
+}
+
+type AdminService interface {
+	UpdateStage(isRankingStage bool) (bool, error)
+	UpdateYear(year int) (int, error)
+	UpdateSeason(season string) (string, error)
+	UpdateCycle(cycle int) (int, error)
+	GetStage() (bool, error)
+	GetYear() (int, error)
+	GetSeason() (string, error)
+	GetCycle() (int, error)
+	GetContributionLogs() ([]model.ContributionLog, error)
+}

@@ -22,6 +22,7 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(&contribution); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

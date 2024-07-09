@@ -27,6 +27,7 @@ func GetRankings(rs service.RankingService) http.HandlerFunc {
 			}
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(&ranking); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

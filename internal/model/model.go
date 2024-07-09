@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type User struct {
 	UID string `json:"uid"`
 }
@@ -64,4 +66,19 @@ type RankingRow struct {
 	Ranked    int    `db:"ranked"`
 	Taking    int    `db:"taking"`
 	NotTaking int    `db:"nottaking"`
+}
+
+type StatusCount struct {
+	Status string `db:"status"`
+	Count  int    `db:"count"`
+}
+
+type ContributionLog struct {
+	LogID          int       `db:"logid"`
+	LogTime        time.Time `db:"logtime"`
+	UID            string    `db:"uid"`
+	JID            int       `db:"jid"`
+	OA             bool      `db:"oa"`
+	InterviewStage int       `db:"interviewstage"`
+	OfferCall      bool      `db:"offercall"`
 }

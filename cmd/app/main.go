@@ -45,17 +45,16 @@ func main() {
 
 	router := http.NewServeMux()
 
-	// HI NORMAN! THIS IS FOR YOU! UNCOMMENT IT AND WRAP A ROUTE LIKE USUAL, NO NEED TO USE auther.Middleware THIS WILL HANDLE THAT ALREADY :)
-	// adminMiddleware := func(next http.Handler) http.Handler {
-	// 	return auther.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	// 		user := auth.MustFromContext(r.Context())
-	// 		if !user.Admin {
-	// 			http.Error(w, "access forbidden", http.StatusForbidden)
-	// 			return
-	// 		}
-	// 		next.ServeHTTP(w, r)
-	// 	}))
-	// }
+	adminMiddleware := func(next http.Handler) http.Handler {
+		return auther.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user := auth.MustFromContext(r.Context())
+			if !user.Admin {
+				http.Error(w, "access forbidden", http.StatusForbidden)
+				return
+			}
+			next.ServeHTTP(w, r)
+		}))
+	}
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
@@ -70,6 +69,18 @@ func main() {
 	router.Handle("POST /contribution", auther.Middleware(handler.AddContribution(s)))
 
 	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
+
+	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
+
+	router.Handle("POST /admin/stage", adminMiddleware(handler.UpdateStage(s)))
+	router.Handle("POST /admin/year", adminMiddleware(handler.UpdateYear(s)))
+	router.Handle("POST /admin/season", adminMiddleware(handler.UpdateSeason(s)))
+	router.Handle("POST /admin/cycle", adminMiddleware(handler.UpdateCycle(s)))
+	router.Handle("GET /admin/stage", adminMiddleware(handler.GetStage(s)))
+	router.Handle("GET /admin/year", adminMiddleware(handler.GetYear(s)))
+	router.Handle("GET /admin/season", adminMiddleware(handler.GetSeason(s)))
+	router.Handle("GET /admin/cycle", adminMiddleware(handler.GetCycle(s)))
+	router.Handle("GET /admin/contributions", adminMiddleware(handler.GetContributionLogs(s)))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

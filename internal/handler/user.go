@@ -32,6 +32,7 @@ func GetUser(us service.UserService) http.HandlerFunc {
 			}
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

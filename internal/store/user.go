@@ -8,12 +8,12 @@ import (
 )
 
 func (s *Store) GetUser(uID string) (user model.User, err error) {
-	err = s.db.Get(&user, "SELECT * FROM Users WHERE UID = $1", uID)
+	err = s.db.Get(&user, "SELECT * FROM Users WHERE UID = $1;", uID)
 	return
 }
 
 func (s *Store) CreateUser(uID string) error {
-	_, err := s.db.Exec("INSERT INTO Users (UID) VALUES ($1) ON CONFLICT DO NOTHING", uID)
+	_, err := s.db.Exec("INSERT INTO Users (UID) VALUES ($1) ON CONFLICT DO NOTHING;", uID)
 	return err
 }
 

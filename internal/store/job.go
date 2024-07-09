@@ -142,7 +142,8 @@ ORDER BY j.company;
 }
 
 func (s *Store) DeleteWatching(uID string, jID int) error {
-	_, err := s.db.Exec("DELETE FROM Watching WHERE uID = $1 AND jID = $2", uID, jID)
+
+	_, err := s.db.Exec("DELETE FROM Watching WHERE uID = $1 AND jID = $2;", uID, jID)
 	if err != nil {
 		return err
 	}
@@ -150,7 +151,7 @@ func (s *Store) DeleteWatching(uID string, jID int) error {
 }
 
 func (s *Store) CreateWatching(uID string, jID int) error {
-	_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2) ON CONFLICT DO NOTHING", uID, jID)
+	_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2) ON CONFLICT DO NOTHING;", uID, jID)
 	if err != nil {
 		return err
 	}
