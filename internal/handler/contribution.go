@@ -17,7 +17,7 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
 		}
-		contribution, contributionTags, err := cs.GetContribution(jID, uID)
+		contribution, contributionTags, err := cs.GetContribution(jID, user.UID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -69,7 +69,7 @@ func AddContribution(cs service.ContributionService) http.HandlerFunc {
 		}
 
 		contributionTags := model.ContributionTags{
-			UID:           uID,
+			UID:           user.UID,
 			JID:           body.JID,
 			OADifficulty:  body.OADifficulty,
 			OALength:      body.OALength,
