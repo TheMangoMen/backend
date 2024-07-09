@@ -22,8 +22,8 @@ func CreateUser(us service.UserService) http.HandlerFunc {
 
 func GetUser(us service.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
-		user, err := us.GetUser(uID)
+		u := auth.MustFromContext(r.Context())
+		user, err := us.GetUser(u.UID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				http.Error(w, "user not found", http.StatusNotFound)
@@ -32,6 +32,7 @@ func GetUser(us service.UserService) http.HandlerFunc {
 			}
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(&user); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)

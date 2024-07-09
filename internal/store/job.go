@@ -41,6 +41,9 @@ LEFT JOIN interviewcounts i
     ON j.JID = i.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
+WHERE j.season = (SELECT * FROM season)
+    AND j.year = (SELECT * FROM year)
+    AND j.cycle = (SELECT * FROM cycle)
 ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
@@ -112,6 +115,9 @@ LEFT JOIN rankingcounts r
     ON j.JID = r.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
+WHERE j.season = (SELECT * FROM season)
+    AND j.year = (SELECT * FROM year)
+    AND j.cycle = (SELECT * FROM cycle)
 ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
@@ -143,20 +149,17 @@ ORDER BY j.company;
 
 func (s *Store) DeleteWatching(uID string, jID int) error {
 
-	_, err := s.db.Exec("DELETE FROM Watching WHERE uID = $1 AND jID = $2", uID, jID)
+	_, err := s.db.Exec("DELETE FROM Watching WHERE uID = $1 AND jID = $2;", uID, jID)
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
-func (s *Store) CreateWatching(uID string, jIDs []int) error {
-	for _, jID := range jIDs {
-		_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2)", uID, jID)
-		if err != nil {
-			return err
-		}
+func (s *Store) CreateWatching(uID string, jID int) error {
+	_, err := s.db.Exec("INSERT INTO Watching VALUES ($1, $2) ON CONFLICT DO NOTHING;", uID, jID)
+	if err != nil {
+		return err
 	}
 	return nil
 }

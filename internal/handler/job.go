@@ -7,6 +7,7 @@ import (
 	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/model"
 	"github.com/TheMangoMen/backend/internal/service"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type GetJobsBody struct {
@@ -15,7 +16,8 @@ type GetJobsBody struct {
 
 func GetJobs(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID, ok := auth.FromContext(r.Context())
+		user, ok := auth.FromContext(r.Context())
+		uID := user.UID
 		if !ok {
 			// TODO: this mechanism needs to be better
 			uID = ""
@@ -37,6 +39,7 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(&jobs); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -45,58 +48,39 @@ func GetJobs(js service.JobService) http.HandlerFunc {
 	}
 }
 
-type CreateWatchingBody struct {
-	UID  string `json:"uid"`
-	JIDs []int  `json:"jids"`
-}
-
-type DeleteWatchingBody struct {
-	JID    int  `json:"jid"`
-	Delete bool `json:"delete"`
+type UpdateWatchingBody struct {
+	JIDs   []int `json:"jids"`
+	Delete bool  `json:"delete"`
 }
 
 func UpdateWatching(js service.JobService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body := DeleteWatchingBody{}
+		body := UpdateWatchingBody{}
 
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		uID, ok := auth.FromContext(r.Context())
+		user, ok := auth.FromContext(r.Context())
 		if !ok {
 			http.Error(w, "Error deleting watching", http.StatusBadRequest)
 			return
 		}
 
+		updateFunc := js.CreateWatching
 		if body.Delete {
-			if err := js.DeleteWatching(uID, body.JID); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
-		} else {
-			jids := []int{body.JID}
-			if err := js.CreateWatching(uID, jids); err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			w.WriteHeader(http.StatusOK)
+			updateFunc = js.DeleteWatching
 		}
-	}
-}
 
-func CreateWatching(js service.JobService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		body := CreateWatchingBody{}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if err := js.CreateWatching(body.UID, body.JIDs); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		const foreignKeyViolationErrorCode = "23503"
+		for _, jID := range body.JIDs {
+			if err := updateFunc(user.UID, jID); err != nil {
+				if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code != foreignKeyViolationErrorCode {
+					http.Error(w, err.Error(), http.StatusInternalServerError)
+					return
+				}
+			}
 		}
 		w.WriteHeader(http.StatusOK)
 	}

@@ -40,27 +40,47 @@ func main() {
 	}
 
 	s := store.NewStore(db)
-
 	auther := auth.NewAuth(cfg.AuthPrivateKey)
-	ensureAuth := auther.Middleware()
-
 	resendClient := email.NewResendClient(cfg.FromEmail, cfg.ResendAPIKey)
 
 	router := http.NewServeMux()
 
+	adminMiddleware := func(next http.Handler) http.Handler {
+		return auther.Middleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			user := auth.MustFromContext(r.Context())
+			if !user.Admin {
+				http.Error(w, "access forbidden", http.StatusForbidden)
+				return
+			}
+			next.ServeHTTP(w, r)
+		}))
+	}
+
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
 	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
-	router.Handle("POST /rankings", handler.AddRanking(s))
+	router.Handle("POST /rankings", auther.Middleware(handler.AddRanking(s)))
 
-	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s))(handler.GetJobs(s)))
+	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s)))
 
-	router.Handle("GET /user", ensureAuth(handler.GetUser(s)))
+	router.Handle("GET /user", auther.Middleware(handler.GetUser(s)))
 
-	router.Handle("GET /contribution/{jID}", ensureAuth(handler.GetContribution(s)))
-	router.Handle("POST /contribution", ensureAuth(handler.AddContribution(s)))
+	router.Handle("GET /contribution/{jID}", auther.Middleware(handler.GetContribution(s)))
+	router.Handle("POST /contribution", auther.Middleware(handler.AddContribution(s)))
 
-	router.Handle("POST /watching", ensureAuth(handler.UpdateWatching(s)))
+	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
+
+	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
+
+	router.Handle("POST /admin/stage", adminMiddleware(handler.UpdateStage(s)))
+	router.Handle("POST /admin/year", adminMiddleware(handler.UpdateYear(s)))
+	router.Handle("POST /admin/season", adminMiddleware(handler.UpdateSeason(s)))
+	router.Handle("POST /admin/cycle", adminMiddleware(handler.UpdateCycle(s)))
+	router.Handle("GET /admin/stage", adminMiddleware(handler.GetStage(s)))
+	router.Handle("GET /admin/year", adminMiddleware(handler.GetYear(s)))
+	router.Handle("GET /admin/season", adminMiddleware(handler.GetSeason(s)))
+	router.Handle("GET /admin/cycle", adminMiddleware(handler.GetCycle(s)))
+	router.Handle("GET /admin/contributions", adminMiddleware(handler.GetContributionLogs(s)))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"*"},

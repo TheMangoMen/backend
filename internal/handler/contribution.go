@@ -12,7 +12,7 @@ import (
 
 func GetContribution(cs service.ContributionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
+		user := auth.MustFromContext(r.Context())
 		jID, err := strconv.Atoi(r.PathValue("jID"))
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
@@ -22,6 +22,7 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		if err := json.NewEncoder(w).Encode(&contribution); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -49,7 +50,7 @@ type AddContributionBody struct {
 
 func AddContribution(cs service.ContributionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		uID := auth.MustFromContext(r.Context())
+		user := auth.MustFromContext(r.Context())
 		body := AddContributionBody{}
 		interviewCnt := 0
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
@@ -60,7 +61,7 @@ func AddContribution(cs service.ContributionService) http.HandlerFunc {
 			interviewCnt = body.InterviewStage
 		}
 		contribution := model.Contribution{
-			UID:            uID,
+			UID:            user.UID,
 			JID:            body.JID,
 			OA:             body.OA,
 			InterviewStage: interviewCnt,
