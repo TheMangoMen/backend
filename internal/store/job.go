@@ -41,6 +41,9 @@ LEFT JOIN interviewcounts i
     ON j.JID = i.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
+WHERE j.season = (SELECT * FROM season)
+    AND j.year = (SELECT * FROM year)
+    AND j.cycle = (SELECT * FROM cycle)
 ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
@@ -112,6 +115,9 @@ LEFT JOIN rankingcounts r
     ON j.JID = r.JID
 LEFT JOIN watches w
     ON j.JID = w.JID
+WHERE j.season = (SELECT * FROM season)
+    AND j.year = (SELECT * FROM year)
+    AND j.cycle = (SELECT * FROM cycle)
 ORDER BY j.company;
 `
 	err := s.db.Select(&rows, query, uID)
