@@ -37,6 +37,7 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 type AddContributionBody struct {
 	JID            int    `json:"jid" db:"jid"`
 	OA             bool   `json:"oa" db:"oa"`
+	Interview      bool   `json:"interview"`
 	InterviewStage int    `json:"interviewcount" db:"interviewstage"`
 	OfferCall      bool   `json:"offercall" db:"offercall"`
 	OADifficulty   string `json:"oadifficulty" db:"oa1"`
@@ -50,15 +51,19 @@ func AddContribution(cs service.ContributionService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		uID := auth.MustFromContext(r.Context())
 		body := AddContributionBody{}
+		interviewCnt := 0
 		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
+		}
+		if body.Interview == true {
+			interviewCnt = body.InterviewStage
 		}
 		contribution := model.Contribution{
 			UID:            uID,
 			JID:            body.JID,
 			OA:             body.OA,
-			InterviewStage: body.InterviewStage,
+			InterviewStage: interviewCnt,
 			OfferCall:      body.OfferCall,
 		}
 
