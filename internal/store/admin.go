@@ -118,7 +118,8 @@ func (s *Store) GetContributionLogs() ([]model.ContributionLog, error) {
 	var contributionLogs []model.ContributionLog
 	query := `
 SELECT *
-FROM ContributionsLogs;
+FROM ContributionsLogs
+ORDER BY LogID DESC;
 `
 	err := s.db.Select(&contributionLogs, query)
 	if err != nil {
