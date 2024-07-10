@@ -61,16 +61,16 @@ SET
 
 	query2 := `
 INSERT INTO
-    Tags (uid, jid, oa1, oa2, int1, int2, offer1)
+    Tags (uid, jid, oadifficulty, oalength, interviewvibe, interviewtechnical, offercomp)
 VALUES
-    (:uid, :jid, :oa1, :oa2, :int1, :int2, :offer1) ON CONFLICT (uid, jid) DO
+    (:uid, :jid, :oadifficulty, :oalength, :interviewvibe, :interviewtechnical, :offercomp) ON CONFLICT (uid, jid) DO
 UPDATE
 SET
-    oa1 = EXCLUDED.oa1,
-    oa2 = EXCLUDED.oa2,
-    int1 = EXCLUDED.int1,
-    int2 = EXCLUDED.int2,
-    offer1 = EXCLUDED.offer1;
+    oadifficulty = EXCLUDED.oadifficulty,
+    oalength = EXCLUDED.oalength,
+    interviewvibe = EXCLUDED.interviewvibe,
+    interviewtechnical = EXCLUDED.interviewtechnical,
+    offercomp = EXCLUDED.offercomp;
 `
 	_, err = s.db.NamedExec(query2, tags)
 

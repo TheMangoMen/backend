@@ -24,11 +24,11 @@ type Contribution struct {
 type ContributionTags struct {
 	UID           string `json:"uid" db:"uid"`
 	JID           int    `json:"jid" db:"jid"`
-	OADifficulty  string `json:"oadifficulty" db:"oa1"`
-	OALength      string `json:"oalength" db:"oa2"`
-	InterviewVibe string `json:"interviewvibe" db:"int1"`
-	InterviewTech string `json:"interviewtechnical" db:"int2"`
-	OfferComp     int    `json:"compensation" db:"offer1"`
+	OADifficulty  string `json:"oadifficulty" db:"oadifficulty"`
+	OALength      string `json:"oalength" db:"oalength"`
+	InterviewVibe string `json:"interviewvibe" db:"interviewvibe"`
+	InterviewTech string `json:"interviewtechnical" db:"interviewtechnical"`
+	OfferComp     int    `json:"compensation" db:"offercomp"`
 }
 
 type Stage struct {
