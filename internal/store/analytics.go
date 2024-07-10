@@ -9,7 +9,7 @@ func (s *Store) GetWatchedJobsStatusCounts(uID string) ([]model.StatusCount, err
 	query := `
 WITH watched_status AS (
     SELECT
-    c.jid,
+    w.jid,
     CASE
         WHEN BOOL_OR(c.offercall) THEN 'offercall'
         WHEN MAX(c.interviewstage) > 0 THEN 'interview'
@@ -17,7 +17,7 @@ WITH watched_status AS (
         ELSE 'nothing'
     END AS status
     FROM users u JOIN watching w ON w.uid = u.uid LEFT JOIN contributions c ON w.jid = c.jid
-    WHERE u.uid = $1 GROUP BY c.jid
+    WHERE u.uid = $1 GROUP BY w.jid
 ),
 status_counts AS (
     SELECT status, COUNT(status) AS count
