@@ -9,7 +9,7 @@ type UserService interface {
 }
 
 type ContributionService interface {
-	GetContribution(jID int, uID string) (model.Contribution, model.ContributionTags, error)
+	GetContribution(jID int, uID string) (model.ContributionCombined, error)
 	AddContribution(contribution model.Contribution, tags model.ContributionTags) (err error)
 }
 
