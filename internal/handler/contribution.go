@@ -16,36 +16,34 @@ func GetContribution(cs service.ContributionService) http.HandlerFunc {
 		jID, err := strconv.Atoi(r.PathValue("jID"))
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
+			return
 		}
-		contribution, contributionTags, err := cs.GetContribution(jID, user.UID)
+		contributionCombined, err := cs.GetContribution(jID, user.UID)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err := json.NewEncoder(w).Encode(&contribution); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		if err := json.NewEncoder(w).Encode(&contributionTags); err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
 		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(&contributionCombined); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
 	}
 }
 
 type AddContributionBody struct {
-	JID            int    `json:"jid" db:"jid"`
-	OA             bool   `json:"oa" db:"oa"`
-	Interview      bool   `json:"interview"`
-	InterviewStage int    `json:"interviewcount" db:"interviewstage"`
-	OfferCall      bool   `json:"offercall" db:"offercall"`
-	OADifficulty   string `json:"oadifficulty" db:"oadifficulty"`
-	OALength       string `json:"oalength" db:"oalength"`
-	InterviewVibe  string `json:"interviewvibe" db:"interviewvibe"`
-	InterviewTech  string `json:"interviewtechnical" db:"interviewtechnical"`
-	OfferComp      int    `json:"compensation" db:"offercomp"`
+	JID            int     `json:"jid" db:"jid"`
+	OA             bool    `json:"oa" db:"oa"`
+	Interview      bool    `json:"interview"`
+	InterviewStage int     `json:"interviewcount" db:"interviewstage"`
+	OfferCall      bool    `json:"offercall" db:"offercall"`
+	OADifficulty   string  `json:"oadifficulty" db:"oadifficulty"`
+	OALength       string  `json:"oalength" db:"oalength"`
+	InterviewVibe  string  `json:"interviewvibe" db:"interviewvibe"`
+	InterviewTech  string  `json:"interviewtechnical" db:"interviewtechnical"`
+	OfferComp      float32 `json:"compensation" db:"offercomp"`
 }
 
 func AddContribution(cs service.ContributionService) http.HandlerFunc {
@@ -57,7 +55,7 @@ func AddContribution(cs service.ContributionService) http.HandlerFunc {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		if body.Interview == true {
+		if body.Interview {
 			interviewCnt = body.InterviewStage
 		}
 		contribution := model.Contribution{

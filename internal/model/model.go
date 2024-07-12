@@ -21,14 +21,27 @@ type Contribution struct {
 	OfferCall      bool   `json:"offercall" db:"offercall"`
 }
 
+type ContributionCombined struct {
+	UID            string  `json:"uid" db:"uid"`
+	JID            int     `json:"jid" db:"jid"`
+	OA             bool    `json:"oa" db:"oa"`
+	InterviewStage int     `json:"interviewcount" db:"interviewstage"`
+	OfferCall      bool    `json:"offercall" db:"offercall"`
+	OADifficulty   string  `json:"oadifficulty" db:"oadifficulty"`
+	OALength       string  `json:"oalength" db:"oalength"`
+	InterviewVibe  string  `json:"interviewvibe" db:"interviewvibe"`
+	InterviewTech  string  `json:"interviewtechnical" db:"interviewtechnical"`
+	OfferComp      float32 `json:"compensation" db:"offercomp"`
+}
+
 type ContributionTags struct {
-	UID           string `json:"uid" db:"uid"`
-	JID           int    `json:"jid" db:"jid"`
-	OADifficulty  string `json:"oadifficulty" db:"oadifficulty"`
-	OALength      string `json:"oalength" db:"oalength"`
-	InterviewVibe string `json:"interviewvibe" db:"interviewvibe"`
-	InterviewTech string `json:"interviewtechnical" db:"interviewtechnical"`
-	OfferComp     int    `json:"compensation" db:"offercomp"`
+	UID           string  `json:"uid" db:"uid"`
+	JID           int     `json:"jid" db:"jid"`
+	OADifficulty  string  `json:"oadifficulty" db:"oadifficulty"`
+	OALength      string  `json:"oalength" db:"oalength"`
+	InterviewVibe string  `json:"interviewvibe" db:"interviewvibe"`
+	InterviewTech string  `json:"interviewtechnical" db:"interviewtechnical"`
+	OfferComp     float32 `json:"compensation" db:"offercomp"`
 }
 
 type Stage struct {
