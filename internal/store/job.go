@@ -127,10 +127,13 @@ ORDER BY j.company;
 
 	jobs := make([]model.Job, 0, len(rows))
 	for _, row := range rows {
-		stages := []model.Stage{
-			{Name: "Ranked", Count: row.Ranked},
-			{Name: "Taking", Count: row.Taking},
-			{Name: "Not Taking", Count: row.NotTaking},
+		var stages []model.Stage
+		if !(row.Ranked == 0 && row.Taking == 0 && row.NotTaking == 0) {
+			stages = []model.Stage{
+				{Name: "Ranked", Count: row.Ranked},
+				{Name: "Taking", Count: row.Taking},
+				{Name: "Not Taking", Count: row.NotTaking},
+			}
 		}
 
 		job := model.Job{
