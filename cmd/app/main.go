@@ -1,13 +1,17 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/email"
 	"github.com/TheMangoMen/backend/internal/handler"
+	"github.com/TheMangoMen/backend/internal/ratelimit"
 	"github.com/TheMangoMen/backend/internal/store"
+	"golang.org/x/time/rate"
 
 	"github.com/caarlos0/env/v11"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -55,6 +59,10 @@ func main() {
 			next.ServeHTTP(w, r)
 		}))
 	}
+
+	// rate: 2 tokens/min, up to 5 tokens in reserve
+	// rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Minute * 2), 5)
+	// ratelimitMiddleware := ratelimit.AuthedMiddleware(rl)
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
