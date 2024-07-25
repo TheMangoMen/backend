@@ -72,6 +72,8 @@ func main() {
 
 	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
 
+	router.Handle("GET /stage", auther.MiddlewareOptional(handler.GetStage(s)))
+
 	router.Handle("POST /admin/stage", adminMiddleware(handler.UpdateStage(s)))
 	router.Handle("POST /admin/year", adminMiddleware(handler.UpdateYear(s)))
 	router.Handle("POST /admin/season", adminMiddleware(handler.UpdateSeason(s)))
