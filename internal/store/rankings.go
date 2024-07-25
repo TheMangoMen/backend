@@ -1,15 +1,40 @@
 package store
 
-import "github.com/TheMangoMen/backend/internal/model"
+import (
+	"database/sql"
 
-func (s *Store) GetRankings(jID int) ([]model.Ranking, error) {
-	var rankings []model.Ranking
-	query := "SELECT * FROM Rankings WHERE jid = $1;"
-	err := s.db.Select(&rankings, query, jID)
+	"github.com/TheMangoMen/backend/internal/model"
+)
+
+// func (s *Store) GetRanking(jID int) (model.Ranking, error) {
+// 	var ranking model.Ranking
+// 	query := "SELECT * FROM Rankings WHERE jid = $1;"
+// 	err := s.db.Select(&rankings, query, jID)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return ranking, nil
+// }
+
+func (s *Store) GetRanking(jID int, uID string) (model.Ranking, error) {
+	var ranking model.Ranking
+	query := `
+SELECT * FROM Rankings
+WHERE jid = $1 AND uid = $2;
+`
+	err := s.db.Get(&ranking, query, jID, uID)
 	if err != nil {
-		return nil, err
+		if err == sql.ErrNoRows {
+			// we are guaranteed to look for a valid jID
+			return model.Ranking{
+				UID: uID,
+				JID: jID,
+			}, nil
+		}
+		return model.Ranking{}, err
 	}
-	return rankings, nil
+
+	return ranking, nil
 }
 
 func (s *Store) AddRanking(ranking model.Ranking) (err error) {

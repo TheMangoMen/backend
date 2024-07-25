@@ -58,7 +58,7 @@ func main() {
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
-	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
+	router.Handle("GET /ranking/{jID}", auther.Middleware(handler.GetRanking(s)))
 	router.Handle("POST /rankings", auther.Middleware(handler.AddRanking(s)))
 
 	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s)))
