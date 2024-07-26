@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/TheMangoMen/backend/internal/auth"
 	"github.com/TheMangoMen/backend/internal/email"
 	"github.com/TheMangoMen/backend/internal/handler"
+	"github.com/TheMangoMen/backend/internal/ratelimit"
 	"github.com/TheMangoMen/backend/internal/store"
+	"golang.org/x/time/rate"
 
 	"github.com/caarlos0/env/v11"
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -56,6 +59,11 @@ func main() {
 		}))
 	}
 
+	// regeneration rate: 1/6 token/sec = 10 tokens/min
+	// starting with the max of 10 tokens in reserve
+	rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Second*6), 10)
+	authedRatelimit := ratelimit.AuthedMiddleware(rl)
+
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
 	router.Handle("GET /ranking/{jID}", auther.Middleware(handler.GetRanking(s)))
@@ -66,9 +74,9 @@ func main() {
 	router.Handle("GET /user", auther.Middleware(handler.GetUser(s)))
 
 	router.Handle("GET /contribution/{jID}", auther.Middleware(handler.GetContribution(s)))
-	router.Handle("POST /contribution", auther.Middleware(handler.AddContribution(s)))
+	router.Handle("POST /contribution", auther.Middleware(authedRatelimit(handler.AddContribution(s))))
 
-	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
+	router.Handle("POST /watching", auther.Middleware(authedRatelimit(handler.UpdateWatching(s))))
 
 	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
 
