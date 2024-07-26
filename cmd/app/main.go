@@ -59,9 +59,9 @@ func main() {
 		}))
 	}
 
-	// regeneration rate: 1/6 token/sec = 10 tokens/min
+	// regeneration rate of 1 token / 2 sec = 30 tokens/min
 	// starting with the max of 10 tokens in reserve
-	rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Second*6), 10)
+	rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Second*2), 10)
 	authedRatelimit := ratelimit.AuthedMiddleware(rl)
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
