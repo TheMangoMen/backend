@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 	"time"
@@ -60,9 +59,10 @@ func main() {
 		}))
 	}
 
-	// rate: 2 tokens/min, up to 5 tokens in reserve
-	// rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Minute * 2), 5)
-	// ratelimitMiddleware := ratelimit.AuthedMiddleware(rl)
+	// regeneration rate: 1/6 token/sec = 10 tokens/min
+	// starting with the max of 10 tokens in reserve
+	rl := ratelimit.NewMapRateLimiter[string](rate.Every(time.Second*6), 10)
+	authedRatelimit := ratelimit.AuthedMiddleware(rl)
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
@@ -74,9 +74,9 @@ func main() {
 	router.Handle("GET /user", auther.Middleware(handler.GetUser(s)))
 
 	router.Handle("GET /contribution/{jID}", auther.Middleware(handler.GetContribution(s)))
-	router.Handle("POST /contribution", auther.Middleware(handler.AddContribution(s)))
+	router.Handle("POST /contribution", auther.Middleware(authedRatelimit(handler.AddContribution(s))))
 
-	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
+	router.Handle("POST /watching", auther.Middleware(authedRatelimit(handler.UpdateWatching(s))))
 
 	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
 
