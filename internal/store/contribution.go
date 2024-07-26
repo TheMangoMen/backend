@@ -39,6 +39,13 @@ SET
     offercall = EXCLUDED.offercall;
 `
 	_, err = s.db.NamedExec(query1, contribution)
+	if err != nil {
+		return err
+	}
+
+	if !contribution.OA && contribution.InterviewStage == 0 && !contribution.OfferCall {
+		return err
+	}
 
 	query2 := `
 INSERT INTO
@@ -54,6 +61,5 @@ SET
     offercomp = EXCLUDED.offercomp;
 `
 	_, err = s.db.NamedExec(query2, tags)
-
 	return err
 }

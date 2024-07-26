@@ -66,7 +66,7 @@ func main() {
 
 	router.Handle("POST /login/{uID}", handler.LogIn(auther, s, resendClient))
 
-	router.Handle("GET /rankings/{jID}", handler.GetRankings(s))
+	router.Handle("GET /ranking/{jID}", auther.Middleware(handler.GetRanking(s)))
 	router.Handle("POST /rankings", auther.Middleware(handler.AddRanking(s)))
 
 	router.Handle("GET /jobs", auther.MiddlewareOptional(handler.GetJobs(s)))
@@ -79,6 +79,8 @@ func main() {
 	router.Handle("POST /watching", auther.Middleware(handler.UpdateWatching(s)))
 
 	router.Handle("GET /analytics/status_counts", auther.Middleware(handler.GetWatchedStatusCounts(s)))
+
+	router.Handle("GET /stage", auther.MiddlewareOptional(handler.GetStage(s)))
 
 	router.Handle("POST /admin/stage", adminMiddleware(handler.UpdateStage(s)))
 	router.Handle("POST /admin/year", adminMiddleware(handler.UpdateYear(s)))

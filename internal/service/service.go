@@ -22,7 +22,7 @@ type JobService interface {
 }
 
 type RankingService interface {
-	GetRankings(jID int) ([]model.Ranking, error)
+	GetRanking(jID int, uID string) (model.Ranking, error)
 	AddRanking(ranking model.Ranking) error
 }
 

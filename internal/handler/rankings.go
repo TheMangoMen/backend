@@ -12,13 +12,15 @@ import (
 	"github.com/TheMangoMen/backend/internal/service"
 )
 
-func GetRankings(rs service.RankingService) http.HandlerFunc {
+func GetRanking(rs service.RankingService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		user := auth.MustFromContext(r.Context())
 		jID, err := strconv.Atoi(r.PathValue("jID"))
 		if err != nil {
 			http.Error(w, "invalid job id", http.StatusBadRequest)
+			return
 		}
-		ranking, err := rs.GetRankings(jID)
+		ranking, err := rs.GetRanking(jID, user.UID)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				http.Error(w, "404 job not found", http.StatusNotFound)
